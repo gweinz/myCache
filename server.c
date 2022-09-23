@@ -8,10 +8,18 @@
 #include <stdio.h>
 #include <string.h>
 
+
 void error(const char *msg)
 {
     perror(msg);
     exit(0);
+}
+
+void print_arr(char **arr) {
+    int i;
+    for (i=0;i < (sizeof (arr) /sizeof (arr[0]));i++) {
+        printf("arg: %s  \n",arr[i]);
+    }
 }
 
 void unlink_file(const char * filename)
@@ -26,26 +34,35 @@ int check_valid_action(const char *action)
     const char *actions[] = {"GET", "PUT", "DEL"};
     int size = sizeof actions / sizeof actions[0]; 
     for (int i = 0; i < size; i++) {
-        if (actions[i] == action) {
-            printf("valid command");
+        if (strcmp(action, actions[i]) == 0) {
+            printf("passed action is %s \n", action);
+            printf("command is valid\n");
             return 1;
         }
     }
     return -1;
 }
 
-void parse_buffer(const char *in_buffer)
+void parse_buffer(char *string)
 {
-    char *string,*found;
+    char *token;
 
-    string = strdup(in_buffer);
-    printf("Original string: '%s'\n",string);
-    const char *args[3];
-    int i = 0;
-    while( (found = strsep(&string," ")) != NULL )
-        printf("%s\n",found);
-        args[i] = found;
-        i = i+1;
+    // at most 2 tokens
+    char *token_arr[2];
+    int count = 0;
+    token = strtok(string, " ");
+    if (check_valid_action(token) != 1) error("bad request");
+
+    while (token != NULL) //read tokens into the array and increment the counter until all tokens are stored
+    {
+        if(count > 1) error ("too many args");
+        token_arr[count] = token;
+        count++;
+        token = strtok(NULL, " ");        
+    }
+
+    char *action = token_arr[0];
+    char *key = token_arr[1];
 }
 
 void handle_incoming(int sock) 
