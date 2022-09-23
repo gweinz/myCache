@@ -1,12 +1,14 @@
 /* a server in the unix domain.  The pathname of 
    the socket address is passed as an argument */
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <unistd.h>
+#include "cache.h"
 #include <stdlib.h>
-#include <sys/un.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <unistd.h>
+
 
 
 void error(const char *msg)
