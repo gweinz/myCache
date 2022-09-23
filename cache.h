@@ -28,4 +28,4 @@ int queue_is_capped(CappedQueue* cq);
 
 void enqueue(CappedQueue* cq, char* key);
 
-#endif CACHE_H_
+#endif // CACHE_H_

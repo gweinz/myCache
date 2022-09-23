@@ -45,12 +45,12 @@ int check_valid_action(const char *action)
     return -1;
 }
 
-void parse_buffer(char *string)
+char** parse_buffer(char *string)
 {
     char *token;
 
     // at most 2 tokens
-    char *token_arr[2];
+    char **token_arr = (char **) malloc( 2 * sizeof( char* ) );;
     int count = 0;
     token = strtok(string, " ");
     if (check_valid_action(token) != 1) error("bad request");
@@ -62,22 +62,29 @@ void parse_buffer(char *string)
         count++;
         token = strtok(NULL, " ");        
     }
-
-    char *action = token_arr[0];
-    char *key = token_arr[1];
+    return token_arr;
 }
 
-void handle_incoming(int sock) 
+
+void handle_cache(CappedQueue* queue, char* command, char* key)
+{
+    // TODO: move to Operate function on cache level
+    enqueue(queue, key);
+    printf("Head is %s\n", queue->head->key);
+}
+
+void process(int sock, CappedQueue* queue, HashMap* hash_map) 
 {
     int signal;
     char buffer[256];
+    char **args;
 
     bzero(buffer,256);
     signal = read(sock, buffer, 255);
-
     if (signal < 0) error("ERROR reading from socket");
-    printf("Here are the commands...\n");
-    parse_buffer(buffer);
+
+    args = parse_buffer(buffer);
+    handle_cache(queue, args[0], args[1]);
 
     signal = write(sock,"I got your message",18);
     if (signal < 0) error("ERROR writing to socket");
@@ -85,6 +92,12 @@ void handle_incoming(int sock)
 
 int main(int argc, char *argv[])
 {
+    if (argc < 2) error("no pathname given");
+    // set up data structures
+    int capacity = 10;
+    CappedQueue* queue = create_capped_queue(capacity);
+    HashMap* hash_map = create_hash_map(capacity);
+
     int sockfd, child_sockfd, servlen, pid;
     socklen_t clilen;
     struct sockaddr_un  cli_addr, serv_addr;
@@ -106,7 +119,7 @@ int main(int argc, char *argv[])
     if(bind(sockfd,(struct sockaddr *)&serv_addr,servlen)<0)
         error("ERROR binding socket"); 
 
-    listen(sockfd,5);
+    listen(sockfd, 5);
     clilen = sizeof(cli_addr);
 
     while (1) {
@@ -120,7 +133,7 @@ int main(int argc, char *argv[])
 
         if (pid == 0) {
             close(sockfd);
-            handle_incoming(child_sockfd);
+            process(child_sockfd, queue, hash_map);
             exit(0);
         } else {
             close(child_sockfd);

@@ -62,24 +62,24 @@ void enqueue(CappedQueue* cq, char* key)
 }
 
 
-int main()
-{
-    CappedQueue* queue = create_capped_queue(10);
-    enqueue(queue, "one");
-    enqueue(queue, "two");
-    // enqueue(queue, "three");
+// int main()
+// {
+//     CappedQueue* queue = create_capped_queue(10);
+//     enqueue(queue, "one");
+//     enqueue(queue, "two");
+//     // enqueue(queue, "three");
 
-    struct Node *tmp, *tmpt;
-    tmp = queue->head;
-    tmpt = queue->tail;
-    printf("Data = %s\n", tmp->key);
-    printf("Data = %s\n", tmp->next->key);
-    printf("Data = %s\n", tmpt->key);
-    // while (tmp != NULL)
-    // {
-    //     printf("Data = %s\n", tmp->key);
-    //     tmp = tmp->next;   
-    // }
+//     struct Node *tmp, *tmpt;
+//     tmp = queue->head;
+//     tmpt = queue->tail;
+//     printf("Data = %s\n", tmp->key);
+//     printf("Data = %s\n", tmp->next->key);
+//     printf("Data = %s\n", tmpt->key);
+//     // while (tmp != NULL)
+//     // {
+//     //     printf("Data = %s\n", tmp->key);
+//     //     tmp = tmp->next;   
+//     // }
 
-}
+// }
 
