@@ -8,7 +8,9 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
-
+#include <sys/mman.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 
 void error(const char *msg)
@@ -17,10 +19,13 @@ void error(const char *msg)
     exit(0);
 }
 
-void print_arr(char **arr) {
-    int i;
-    for (i=0;i < (sizeof (arr) /sizeof (arr[0]));i++) {
-        printf("arg: %s  \n",arr[i]);
+void print_queue(CappedQueue* queue) {
+    struct Node *tmp;
+    tmp = queue->head;
+    while (tmp != NULL)
+    {
+        printf("Node = %s\n", tmp->key);
+        tmp = tmp->next;   
     }
 }
 
@@ -37,8 +42,6 @@ int check_valid_action(const char *action)
     int size = sizeof actions / sizeof actions[0]; 
     for (int i = 0; i < size; i++) {
         if (strcmp(action, actions[i]) == 0) {
-            printf("passed action is %s \n", action);
-            printf("command is valid\n");
             return 1;
         }
     }
@@ -70,7 +73,6 @@ void handle_cache(CappedQueue* queue, char* command, char* key)
 {
     // TODO: move to Operate function on cache level
     enqueue(queue, key);
-    printf("Head is %s\n", queue->head->key);
 }
 
 void process(int sock, CappedQueue* queue, HashMap* hash_map) 
@@ -84,7 +86,10 @@ void process(int sock, CappedQueue* queue, HashMap* hash_map)
     if (signal < 0) error("ERROR reading from socket");
 
     args = parse_buffer(buffer);
-    handle_cache(queue, args[0], args[1]);
+    char *c = strdup(args[0]);
+    char *k = strdup(args[1]);
+    handle_cache(queue, c, k);
+    print_queue(queue);
 
     signal = write(sock,"I got your message",18);
     if (signal < 0) error("ERROR writing to socket");
@@ -93,9 +98,13 @@ void process(int sock, CappedQueue* queue, HashMap* hash_map)
 int main(int argc, char *argv[])
 {
     if (argc < 2) error("no pathname given");
-    // set up data structures
     int capacity = 10;
+    // set up data structures
+    // must used shared memory
+    // void* shmem = mmap(NULL, sizeof(CappedQueue*), PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
     CappedQueue* queue = create_capped_queue(capacity);
+    // memcpy(shmem, queue, sizeof(*queue));
+
     HashMap* hash_map = create_hash_map(capacity);
 
     int sockfd, child_sockfd, servlen, pid;
@@ -121,24 +130,32 @@ int main(int argc, char *argv[])
 
     listen(sockfd, 5);
     clilen = sizeof(cli_addr);
-
-    while (1) {
-        // accept new socket
+    do
+    { 
+        // accept a connection on a socket
         child_sockfd = accept(sockfd, (struct sockaddr *)&cli_addr, &clilen);
-        if (child_sockfd < 0) error("ERROR on accept");
+        process(child_sockfd, queue, hash_map);
+        close(child_sockfd);
+    } while(1);
+    // while (1) {
+    //     // accept new socket
+    //     child_sockfd = accept(sockfd, (struct sockaddr *)&cli_addr, &clilen);
+    //     CappedQueue* child_q;
+    //     if (child_sockfd < 0) error("ERROR on accept");
 
-        // fork process
-        pid = fork();
-        if (pid < 0) error("ERROR on fork");
+    //     // fork process
+    //     pid = fork();
+    //     if (pid < 0) error("ERROR on fork");
 
-        if (pid == 0) {
-            close(sockfd);
-            process(child_sockfd, queue, hash_map);
-            exit(0);
-        } else {
-            close(child_sockfd);
-        }
-    }
+    //     if (pid == 0) {
+    //         close(sockfd);
+    //         child_q = queue;
+    //         process(child_sockfd, child_q, hash_map);
+    //         exit(0);
+    //     } else {
+    //         close(child_sockfd);
+    //     }
+    // }
     close(sockfd);
     return 0;
 }

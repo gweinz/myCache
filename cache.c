@@ -53,12 +53,14 @@ void enqueue(CappedQueue* cq, char* key)
 {
     Node* to_add = create_node(key);
     to_add->next = cq->head;
+    printf("adding key %s \n ", key);
 
     if ( queue_is_empty( cq ) )
         cq->tail = cq->head = to_add;
     else 
         cq->head->prev = to_add;
         cq->head = to_add;
+    cq->count++;
 }
 
 
