@@ -1,0 +1,54 @@
+#include <stdio.h>
+#include <string.h>
+#include <pthread.h>
+#include <stdlib.h>
+#include "cache.h"
+#include <unistd.h>
+
+typedef struct{
+    char *k;
+    CappedQueue *q;
+    } args;
+
+void print_queue(CappedQueue* queue) {
+    struct Node *tmp;
+    tmp = queue->head;
+    while (tmp != NULL)
+    {
+        printf("Node = %s\n", tmp->key);
+        tmp = tmp->next;   
+    }
+}
+
+void *some_func (void* arg)
+{
+    args *argsa = (args*)arg;
+    // sleep (.1); //to give other threads chances to cut in
+    enqueue(argsa->q, argsa->k);
+    pthread_exit( NULL );
+}
+int main()
+{
+    CappedQueue* queue = create_capped_queue(10);
+    pthread_t thread[3];
+    char* alph[10] = {"one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"};
+    int index;
+    for (index = 0; index < 3; index++)
+    {
+        args* tmp = (args *)malloc( sizeof( args ));
+        tmp->k=alph[index];
+        tmp->q=queue;
+        
+        if (pthread_create(&thread[index], NULL, some_func, tmp ))
+        {
+            printf ("something went wrong creating the thread"); 
+        }
+
+    }
+    pthread_join ( thread[0], NULL);
+    pthread_join ( thread[1], NULL);
+    pthread_join ( thread[2], NULL);
+
+    print_queue(queue);
+    return 0;
+}

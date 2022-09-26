@@ -53,7 +53,6 @@ void enqueue(CappedQueue* cq, char* key)
 {
     Node* to_add = create_node(key);
     to_add->next = cq->head;
-    printf("adding key %s \n ", key);
 
     if ( queue_is_empty( cq ) )
         cq->tail = cq->head = to_add;
@@ -61,6 +60,53 @@ void enqueue(CappedQueue* cq, char* key)
         cq->head->prev = to_add;
         cq->head = to_add;
     cq->count++;
+}
+
+void dequeue(CappedQueue* cq, char* key)
+{
+    // If empty dont do anything
+    if ( queue_is_empty( cq ) ) return;
+
+    if (cq->tail == cq->head) 
+        cq->head = NULL;
+
+    // Find old tail remove its linkages and free it
+    Node* rmv = cq->tail;
+    cq->tail = rmv->prev;
+ 
+    if (cq->tail) 
+        cq->tail->next = NULL;
+ 
+    free( rmv );
+
+    cq->count--;
+}
+
+void move_to_head(CappedQueue* cq, char* key)
+{
+
+}
+
+void operate(CappedQueue* cq, HashMap* hm, char* key)
+{
+    unsigned hash = djb_hash(key) % cq->capacity;
+    char** hit = hm->buckets[hash];
+
+    if (hit == NULL)
+    {
+        // if miss and is not at capacity push key to head and add to hashmap
+
+        // if miss and at capacity, deque and add new key to head
+    }
+
+    else {
+        if (hit == cq->head->key) return;
+
+        move_to_head(cq, key);
+    }
+    // if key is present in hashmap retrieve and move to head
+
+ 
 }
 
 

@@ -28,4 +28,10 @@ int queue_is_capped(CappedQueue* cq);
 
 void enqueue(CappedQueue* cq, char* key);
 
+void dequeue(CappedQueue* cq, char* key);
+
+void move_to_head(CappedQueue* cq, char* key)
+
+void operate(CappedQueue* cq, HashMap* hm, char* key);
+
 #endif // CACHE_H_

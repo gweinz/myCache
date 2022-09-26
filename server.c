@@ -75,7 +75,7 @@ void handle_cache(CappedQueue* queue, char* command, char* key)
     enqueue(queue, key);
 }
 
-void process(int sock, CappedQueue* queue, HashMap* hash_map) 
+void connection_handler(int sock, CappedQueue* queue, HashMap* hash_map) 
 {
     int signal;
     char buffer[256];
@@ -88,8 +88,8 @@ void process(int sock, CappedQueue* queue, HashMap* hash_map)
     args = parse_buffer(buffer);
     char *c = strdup(args[0]);
     char *k = strdup(args[1]);
+
     handle_cache(queue, c, k);
-    print_queue(queue);
 
     signal = write(sock,"I got your message",18);
     if (signal < 0) error("ERROR writing to socket");
@@ -100,10 +100,8 @@ int main(int argc, char *argv[])
     if (argc < 2) error("no pathname given");
     int capacity = 10;
     // set up data structures
-    // must used shared memory
-    // void* shmem = mmap(NULL, sizeof(CappedQueue*), PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
+   
     CappedQueue* queue = create_capped_queue(capacity);
-    // memcpy(shmem, queue, sizeof(*queue));
 
     HashMap* hash_map = create_hash_map(capacity);
 
@@ -134,28 +132,13 @@ int main(int argc, char *argv[])
     { 
         // accept a connection on a socket
         child_sockfd = accept(sockfd, (struct sockaddr *)&cli_addr, &clilen);
-        process(child_sockfd, queue, hash_map);
+        connection_handler(child_sockfd, queue, hash_map);
+
+        print_queue(queue);
+        
         close(child_sockfd);
     } while(1);
-    // while (1) {
-    //     // accept new socket
-    //     child_sockfd = accept(sockfd, (struct sockaddr *)&cli_addr, &clilen);
-    //     CappedQueue* child_q;
-    //     if (child_sockfd < 0) error("ERROR on accept");
-
-    //     // fork process
-    //     pid = fork();
-    //     if (pid < 0) error("ERROR on fork");
-
-    //     if (pid == 0) {
-    //         close(sockfd);
-    //         child_q = queue;
-    //         process(child_sockfd, child_q, hash_map);
-    //         exit(0);
-    //     } else {
-    //         close(child_sockfd);
-    //     }
-    // }
+    
     close(sockfd);
     return 0;
 }

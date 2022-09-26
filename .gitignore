@@ -1,0 +1,7 @@
+./cache
+./multi
+./mycache
+./server
+./shared
+./shared.c
+./multi.c

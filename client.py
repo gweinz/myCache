@@ -11,7 +11,7 @@ print(server_address[:-1])
 print('connecting to %s' % server_address)
 try:
     sock.connect(server_address[:-1])
-    message = 'GET three'
+    message = 'GET dixieland'
     print('sending:', message)
     sock.sendall(message.encode())
     amount_received = 0
