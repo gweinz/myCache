@@ -22,7 +22,7 @@ CappedQueue* create_capped_queue(unsigned capacity);
 
 HashMap* create_hash_map(unsigned capacity);
 
-unsigned djb_hash(unsigned char *str);
+unsigned djb_hash(char *str);
 
 int queue_is_capped(CappedQueue* cq);
 
@@ -30,7 +30,7 @@ void enqueue(CappedQueue* cq, char* key);
 
 void dequeue(CappedQueue* cq, char* key);
 
-void move_to_head(CappedQueue* cq, char* key)
+void move_to_head(CappedQueue* cq, char* key);
 
 void operate(CappedQueue* cq, HashMap* hm, char* key);
 

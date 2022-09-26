@@ -30,7 +30,7 @@ HashMap* create_hash_map(unsigned capacity) {
     return hm;
 }
 
-unsigned djb_hash(unsigned char *str)
+unsigned djb_hash(char *str)
 {
     unsigned long hash = 5381;
     int c;
@@ -90,7 +90,7 @@ void move_to_head(CappedQueue* cq, char* key)
 void operate(CappedQueue* cq, HashMap* hm, char* key)
 {
     unsigned hash = djb_hash(key) % cq->capacity;
-    char** hit = hm->buckets[hash];
+    char* hit = hm->buckets[hash];
 
     if (hit == NULL)
     {

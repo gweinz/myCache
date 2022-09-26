@@ -23,8 +23,8 @@ void print_queue(CappedQueue* queue) {
 void *some_func (void* arg)
 {
     args *argsa = (args*)arg;
-    // sleep (.1); //to give other threads chances to cut in
-    enqueue(argsa->q, argsa->k);
+    sleep (1); //to give other threads chances to cut in
+    enqueue((*argsa).q, (*argsa).k);
     pthread_exit( NULL );
 }
 int main()
@@ -33,13 +33,17 @@ int main()
     pthread_t thread[3];
     char* alph[10] = {"one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"};
     int index;
+    args *arg;
+
     for (index = 0; index < 3; index++)
     {
-        args* tmp = (args *)malloc( sizeof( args ));
-        tmp->k=alph[index];
-        tmp->q=queue;
+        arg = malloc(sizeof(args));
+        (*arg).k = alph[index];
+        (*arg).q = queue;
+        // tmp->k=alph[index];
+        // tmp->q=queue;
         
-        if (pthread_create(&thread[index], NULL, some_func, tmp ))
+        if (pthread_create(&thread[index], NULL, some_func, arg ))
         {
             printf ("something went wrong creating the thread"); 
         }
@@ -50,5 +54,6 @@ int main()
     pthread_join ( thread[2], NULL);
 
     print_queue(queue);
+    printf("q size %d \n", queue->count);
     return 0;
 }
