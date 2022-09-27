@@ -1,5 +1,14 @@
-# Distributed Cache in C
+# Threaded Cache in C
 
-Side project I built to strengthen my skills and fundamentals in lower level programming using as few libraries as possible. The following code produces a simple implementation of a multithreaded Cache built in C. The Server is in the Unix domain and takes an address to begin. The server then accepts GET or DEL requests followeed by a KEY over the connection to either retrieve an item from the Cache or adds it to the Cache if there is a miss - one can also invalidate an entry into the Cache with the DEL command. 
+A multithreaded cache built from scratch in C. The queue (which I denoted capped queue) takes a capacity and so does the hash map to emulate a finite amount of storage for a cache. Both were written from scratch to demonstrate the core implementations of these ubiquitous data structures.
 
-Client is written in Python for simplicity sake.
+To compile run:
+gcc -o ./exe/mycache server.c cache.c
+
+The executable takes any pathname as an argument for the Unix connection. 
+
+-> ./exe/mycache TEST
+
+Will open a socket to listen for connections over TEST on the Unix domain. The python client script shows how to connect simply.
+
+The server only accepts GET or DEL commands followed by a KEY to retrieve or invalidate keys from a Cache. At the moment this lacks the ability to store actual data beyond the keys however that will be implemented soon.
