@@ -1,14 +1,15 @@
+#include "cache.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "cache.h"
-
+#include <time.h>
 
 
 Node* create_node(char *key) 
 {
     Node* new_node = (Node *)malloc( sizeof( Node ) );
     new_node->key = key;
+    new_node->val = rand(); 
     new_node->prev = NULL;
     new_node->next = NULL;
     return new_node;

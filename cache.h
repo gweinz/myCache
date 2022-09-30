@@ -4,6 +4,8 @@
 typedef struct Node {
     struct Node *prev, *next;
     char *key;
+    // storing val for now as a random int to emulate data
+    int val;
 } Node;
 
 typedef struct CappedQueue {
