@@ -48,7 +48,7 @@ int check_valid_action(const char *action)
     return -1;
 }
 
-char** parse_buffer(char *string)
+char** parse_buffer(char *string) 
 {
     char *token;
 
@@ -69,10 +69,12 @@ char** parse_buffer(char *string)
 }
 
 
-void handle_cache(CappedQueue* queue, char* command, char* key)
+void handle_cache(CappedQueue* queue, HashMap* hash_map, char* command, char* key) 
 {
     // TODO: move to Operate function on cache level
-    enqueue(queue, key);
+    if (strcmp("GET", command) == 0) operate(queue, hash_map, key);
+
+    else printf("Deleting key: %s", key);
 }
 
 void connection_handler(int sock, CappedQueue* queue, HashMap* hash_map) 
@@ -89,13 +91,13 @@ void connection_handler(int sock, CappedQueue* queue, HashMap* hash_map)
     char *c = strdup(args[0]);
     char *k = strdup(args[1]);
 
-    handle_cache(queue, c, k);
+    handle_cache(queue, hash_map, c, k);
 
     signal = write(sock,"I got your message",18);
     if (signal < 0) error("ERROR writing to socket");
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char *argv[]) 
 {
     if (argc < 2) error("no pathname given");
     int capacity = 10;
@@ -135,7 +137,7 @@ int main(int argc, char *argv[])
         connection_handler(child_sockfd, queue, hash_map);
 
         print_queue(queue);
-        
+
         close(child_sockfd);
     } while(1);
     

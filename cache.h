@@ -13,7 +13,7 @@ typedef struct CappedQueue {
 } CappedQueue;
 
 typedef struct HashMap {
-    char **buckets;
+    Node **buckets;
     unsigned capacity;
 } HashMap;
 
@@ -28,10 +28,12 @@ int queue_is_capped(CappedQueue* cq);
 
 void enqueue(CappedQueue* cq, char* key);
 
-void dequeue(CappedQueue* cq, char* key);
+void dequeue(CappedQueue* cq);
 
-void move_to_head(CappedQueue* cq, char* key);
+void move_to_head(CappedQueue* cq,  Node* item);
 
-void operate(CappedQueue* cq, HashMap* hm, char* key);
+void handle_miss(CappedQueue* cq, HashMap* hm, char* key, unsigned hash);
+
+Node* operate(CappedQueue* cq, HashMap* hm, char* key);
 
 #endif // CACHE_H_
