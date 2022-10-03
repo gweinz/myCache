@@ -1,6 +1,6 @@
-# Threaded Cache in C
+# Cache in C
 
-A multithreaded cache built from scratch in C. The queue (which I denoted capped queue) takes a capacity and so does the hash map to emulate a finite amount of storage for a cache. Both were written from scratch to demonstrate the core implementations of these ubiquitous data structures.
+A cache built from scratch in C. The queue (which I denoted capped queue) takes a capacity and so does the hash map to emulate a finite amount of storage for a cache. Both were written from scratch to demonstrate the core implementations of these ubiquitous data structures.
 
 To compile run:
 gcc -o ./exe/mycache server.c cache.c
