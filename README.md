@@ -11,4 +11,4 @@ The executable takes any pathname as an argument for the Unix connection.
 
 Will open a socket to listen for connections over TEST on the Unix domain. The python client script shows how to connect simply.
 
-The server only accepts GET or DEL commands followed by a KEY to retrieve or invalidate keys from a Cache. At the moment this lacks the ability to store actual data beyond the keys however that will be implemented soon.
+The server only accepts GET or DEL commands followed by a KEY to retrieve or invalidate keys from a Cache. For simplicity sake I emulated the process of storing data in the hash by assigned each new node with a random integer as its value. The capacity is set to 10 so once 10 items are in the cache any further get operations will result in an eviction that defaults to LRU.
