@@ -22,9 +22,10 @@ void error(const char *msg)
 void print_queue(CappedQueue* queue) {
     struct Node *tmp;
     tmp = queue->head;
+    printf("Begin: \n");
     while (tmp != NULL)
     {
-        printf("Node = %s\n", tmp->key);
+        printf("Node with key of %s has val %d \n", tmp->key, tmp->val);
         tmp = tmp->next;   
     }
 }
@@ -72,9 +73,12 @@ char** parse_buffer(char *string)
 void handle_cache(CappedQueue* queue, HashMap* hash_map, char* command, char* key) 
 {
     // TODO: move to Operate function on cache level
-    if (strcmp("GET", command) == 0) operate(queue, hash_map, key);
-
+    struct Node *res;
+    if (strcmp("GET", command) == 0) {
+        res = refer(queue, hash_map, key);
+    }
     else printf("Deleting key: %s", key);
+
 }
 
 void connection_handler(int sock, CappedQueue* queue, HashMap* hash_map) 

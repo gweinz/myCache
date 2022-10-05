@@ -45,6 +45,15 @@ unsigned djb_hash(char *str)
     return hash;
 }
 
+unsigned int hash_function(const char* str, int capacity)
+{
+    unsigned int hash = 5381, c;
+    while ((c = *str++))
+      hash += (hash << 5) + (c | 040);
+
+    return (hash % capacity);
+}
+
 int queue_is_capped(CappedQueue* cq) 
 {
     return cq->capacity == cq->count;
@@ -120,22 +129,30 @@ void handle_miss(CappedQueue* cq, HashMap* hm, char* key, unsigned hash)
     }
 }
 
-Node* operate(CappedQueue* cq, HashMap* hm, char* key) 
+Node* refer(CappedQueue* cq, HashMap* hm, char* key) 
 {
-    unsigned hash = djb_hash(key) % cq->capacity;
+    char *mod_key = strdup(key);
+    // unsigned hash = djb_hash(mod_key) % cq->capacity;
+    unsigned int hash = hash_function(mod_key, hm->capacity);
+    printf("the hash is %d \n", hash);
+    
     Node* hit = hm->buckets[hash];
 
     if (hit == NULL) {
+        printf("Was a miss! \n");
         handle_miss(cq, hm, key, hash);
         return hm->buckets[hash];
     }
     // hit but not the right key. aka collision
     else if (strcmp(hit->key, key) != 0) {
+        printf("Have to check! \n");
         // traverse hashmap because it was a false miss
         for(int i = 0; i < hm->capacity; ++i ){
-            if (strcmp(hm->buckets[i]->key, key) == 0) {
+            if (hm->buckets[i]) {
+                if (strcmp(hm->buckets[i]->key, key) == 0) {
                 move_to_head(cq, hm->buckets[i]);
                 return hm->buckets[i];
+                }
             }
         }
 
@@ -145,6 +162,7 @@ Node* operate(CappedQueue* cq, HashMap* hm, char* key)
 
     }
     else {
+        printf("Was a hit! \n");
          // if key is present in hashmap retrieve and move to head
         if (hit == cq->head) return hit;
         move_to_head(cq, hit);
